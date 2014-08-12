@@ -7,7 +7,7 @@ class FuncDataTransform {
 
   def count(lri: List[LoggedItem]) = lri.size
 
-  def responseSize(loggedResponses: List[LoggedResponse]) = {
+  def responseSize(loggedResponses: List[LoggedResponse]):Int = {
     loggedResponses.foldLeft(0)((acc, response) => acc + response.respSize)
   }
 
@@ -30,21 +30,26 @@ class FuncDataTransform {
   def getByMostPopularUrls(requests: List[LoggedRequest]) = {
     requests.groupBy(request => request.url).toArray.sortBy(request => count(request._2)).reverse
 
+
   }
-  def getInfoForURL (requests: List[LoggedRequest]) = {
+
+  def getInfoForURL(requests: List[LoggedRequest]) = {
     val urlToInfo = getByMostPopularUrls(requests)
-    errorRate(urlToInfo(0)._2)/count(urlToInfo(0)._2)
-      urlToInfo(0)._1
-
-
-
-
-    //    urlToInfo(0)._2 match {
-    //      case ("GET",_, "200") => List(LoggedResponse(_, 200))
-    //      case ("GET",_,_)=> new LoggedError(_)
-    //      case ("POST",_,"200")=> List(LoggedResponse(_, 100))
-    //    }
-
+    (urlToInfo(0)._1,count(urlToInfo(0)._2),
+      errorRate(urlToInfo(0)._2),
+      requestToResponseSize(urlToInfo(0)._2))
   }
+
+
+  def requestToResponseSize(requests: List[LoggedRequest]) = {
+    for (request <- requests)
+      (request.httpType, request.status) match {
+        case ("GET", "200") => new LoggedResponse("_", 200)
+        case ("POST", "200") => new LoggedResponse("_", 100)
+        case (_, _) => List.empty
+          .toList
+      }
+  }
+
 
 }
