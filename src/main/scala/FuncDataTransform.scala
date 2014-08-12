@@ -27,14 +27,16 @@ class FuncDataTransform {
       .toList.sortBy(res => res._1)
   }
 
-  def getByMostPopularUrls(requests: List[LoggedRequest]) = {
+  def sortByMostPopularUrls(requests: List[LoggedRequest]) = {
     requests.groupBy(request => request.url).toArray.sortBy(request => count(request._2)).reverse
-
-
+  }
+  def getTwoMostPopularUrls(requests: List[LoggedRequest]) = {
+    val twoMost = sortByMostPopularUrls(requests)
+    (twoMost(0)._1, twoMost(1)._1)
   }
 
   def getInfoForURL(requests: List[LoggedRequest]) = {
-    val urlToInfo = getByMostPopularUrls(requests)
+    val urlToInfo = sortByMostPopularUrls(requests)
     (urlToInfo(0)._1,count(urlToInfo(0)._2),
       errorRate(urlToInfo(0)._2),
       requestToResponseSize(urlToInfo(0)._2))
